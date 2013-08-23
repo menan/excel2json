@@ -1,0 +1,78 @@
+<html>
+<head>
+<title>Excel to JSON converter</title>
+
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
+<script type="text/javascript">
+var text = "";
+
+function updated () {
+	// body...
+	text = $("#excel-content").val();
+	// console.log("text area changed: " + text);
+	text_lines = text.split("\n");
+	text_headers = text_lines[0].split("\t");
+
+	var json_string = "[";
+	var total_objects = 0;
+
+	for (var i = 1; i < text_lines.length; i++) {
+		text_body = text_lines[i].split("\t");
+		console.log("length of body: " + text_body.length);
+		if (text_body.length == text_headers.length) 
+		{
+			total_objects++;
+			json_string = json_string.concat("\t{\n");
+
+			for (var j = 0; j < text_body.length - 1; j++) {
+				header_text = text_headers[j].replace(/ /gi,"_");
+				body_text = text_body[j].replace(/["']/g, "");
+				json_string = json_string.concat("\t\t\"" + header_text + "\"" + ":" + "\"" + body_text+ "\"");
+	
+				if (j < text_body.length - 2){
+					json_string = json_string.concat(",");
+				}
+				json_string = json_string.concat("\n");
+				// console.log(header_text + ":" + text_body[j])
+			};
+	
+			json_string = json_string.concat("\t}");
+			// json_string = json_string.concat(",\n");
+	
+			if (i < text_lines.length - 1){
+				json_string = json_string.concat(",\n");
+				// json_string = json_string.concat("");
+			}
+		}
+	};
+	json_string = json_string.concat("\n]");
+	$(".objects").html(total_objects + " json objects found");
+	$(".converted_json").html(json_string);
+	// var text=text.split("\n");
+}
+</script>
+<style type="text/css">
+
+#excel-content{
+	width: 100%;
+	height: 38%;
+}
+
+.converted_json{
+	width: 100%;
+	border: 1px solid gray;
+	font-family: "courier new";
+	font-size: 12px;
+	height: 58%;
+}
+
+</style>
+</head>
+<body>
+Paste ur excel content here:
+<textarea id="excel-content" onkeyup="updated()"></textarea>
+Converted JSON <span class="objects"></span>:
+<textarea class="converted_json" disabled></textarea>
+</body>
+</html>
